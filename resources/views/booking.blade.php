@@ -93,3 +93,75 @@
 </div>
 
 @endsection
+
+@push('bottom-script')
+<script>
+    const duration = document.getElementById('duration');
+    const jam = document.getElementById('jam');
+    const price = document.getElementById('price');
+    const tanggal = document.getElementById('tanggal');
+    const jenisLapangan = document.getElementById('jenis_lapangan');
+
+    // Jika tanggal berubah, atur opsi jam berdasarkan hari
+    if (tanggal) {
+        tanggal.addEventListener('change', function () {
+            const date = new Date(tanggal.value);
+            const day = date.getDay();
+            jam.innerHTML = '<option value="" disabled selected>Jam</option>';
+            const startJam = (day == 0 || day == 6) ? 6 : 15;
+            for (let i = startJam; i <= 23; i++) {
+                jam.innerHTML += `<option value="${i}">${i}:00</option>`;
+            }
+        });
+    }
+
+    // Fungsi untuk menghitung harga
+    function calculatePrice() {
+        if (jenisLapangan.value && duration.value) {
+            let hargaPerJam = 0;
+
+            if (jenisLapangan.value === 'plester') {
+                hargaPerJam = 80000;
+            } else if (jenisLapangan.value === 'sintetis') {
+                hargaPerJam = 100000;
+            }
+
+            if (hargaPerJam > 0) {
+                price.value = hargaPerJam * duration.value;
+            } else {
+                price.value = 0; // Harga default jika jenis lapangan tidak valid
+            }
+        } else {
+            price.value = 0; // Jika belum ada durasi atau jenis lapangan
+        }
+    }
+
+    // Hitung harga saat jenis lapangan berubah
+    if (jenisLapangan) {
+        jenisLapangan.addEventListener('change', calculatePrice);
+    }
+
+    // Hitung harga saat durasi berubah
+    if (duration) {
+        duration.addEventListener('change', calculatePrice);
+    }
+
+    // Validasi durasi berdasarkan jam yang dipilih
+    if (jam && duration) {
+        jam.addEventListener('change', function () {
+            const selectedJam = parseInt(jam.value);
+            duration.setAttribute('max', 24 - selectedJam);
+        });
+    }
+
+    // Validasi durasi input
+    function validateDuration(input) {
+        if (input.value < parseInt(input.min)) {
+            input.value = input.min;
+        }
+        if (input.value > parseInt(input.max)) {
+            input.value = input.max;
+        }
+    }
+</script>
+@endpush

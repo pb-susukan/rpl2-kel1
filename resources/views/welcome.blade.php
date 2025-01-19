@@ -47,6 +47,61 @@
 @endsection
 
 @push('bottom-script')
+<script>
+    const dp = new DayPilot.Calendar("dp", {
+        viewType: "Resources",
+        cellDuration: 60,
+        timeRangeSelectedHandling: "Disabled",
+        eventMoveHandling: "Disabled",
+        eventResizeHandling: "Disabled",
+        eventClickHandling: "Disabled",
+        eventHoverHandling: "Disabled",
+    });
+
+    dp.heightSpec = "BusinessHoursNoScroll";
+    dp.businessBeginsHour = 6;
+    dp.businessEndsHour = 24;
+    dp.width = 856;
+
+    const dayList = [];
+    const today = new Date();
+
+    for (let i = 0; i < 7; i++) {
+        const currentDate = new Date(today);
+        currentDate.setDate(today.getDate() + i);
+
+        const day = currentDate.getDate().toString().padStart(2, '0');
+        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+        const year = currentDate.getFullYear();
+
+        const formattedDate = new Intl.DateTimeFormat('id-ID', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+        }).format(currentDate);
+
+        dayList.push({
+            name: formattedDate,
+            id: `${day}-${month}-${year}`
+        });
+    }
+
+    dp.columns.list = dayList;
+    dp.events.list = @json($bookingList);
+    dp.init();
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const currentDateElement = document.getElementById('currentDate');
+        const formattedDate = new Intl.DateTimeFormat('id-ID', {
+            day: '2-digit',
+            month: '2-digit',
+            year: '2-digit',
+        }).format(today);
+
+        currentDateElement.textContent = formattedDate;
+    });
+</script>
 
 <style>
     #dp {

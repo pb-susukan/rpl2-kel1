@@ -27,6 +27,7 @@ class AuthController extends Controller
         if ($findAdmin) {
             $checkPassword = Hash::check($credentials['password'], $findAdmin->password);
             if ($checkPassword) {
+                //session admin
                 $request->session()->put('admin', $findAdmin);
 
                 return redirect()->route('admin.index');
